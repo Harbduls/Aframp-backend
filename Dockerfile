@@ -15,7 +15,6 @@ COPY Cargo.toml Cargo.lock ./
 # Copy source
 COPY src ./src
 COPY migrations ./migrations
-COPY contracts ./contracts
 
 # Build release
 RUN cargo build --release --features database
@@ -32,7 +31,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy binary
-COPY --from=builder /app/target/release/Bitmesh-backend /app/aframp-backend
+COPY --from=builder /app/target/release/Aframp-Backend /app/aframp-backend
 
 # Copy migrations
 COPY --from=builder /app/migrations /app/migrations
