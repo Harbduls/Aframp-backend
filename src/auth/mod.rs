@@ -28,10 +28,16 @@ pub mod token_limiter;
 pub mod scope_catalog;
 #[cfg(feature = "database")]
 pub mod scope_hierarchy;
+#[cfg(feature = "database")]
+pub mod refresh_token_service;
+#[cfg(feature = "database")]
+pub mod refresh_token_validator;
 #[cfg(test)]
 pub mod oauth_tests;
 #[cfg(test)]
 pub mod scope_tests;
+#[cfg(test)]
+pub mod refresh_token_tests;
 
 #[cfg(feature = "database")]
 pub use handlers::AuthHandlerState;
@@ -54,6 +60,15 @@ pub use token_limiter::{RateLimitConfig, RateLimitError, TokenRateLimiter};
 pub use scope_catalog::{ScopeCatalog, ScopeCategory, ScopeDefinition};
 #[cfg(feature = "database")]
 pub use scope_hierarchy::ScopeHierarchy;
+#[cfg(feature = "database")]
+pub use refresh_token_service::{
+    RefreshTokenError, RefreshTokenMetadata, RefreshTokenRequest, RefreshTokenResponse,
+    RefreshTokenService, RefreshTokenStatus,
+};
+#[cfg(feature = "database")]
+pub use refresh_token_validator::{
+    RefreshTokenValidator, RefreshTokenValidationContext, RefreshTokenValidationResult,
+};
 
 #[cfg(feature = "database")]
 use axum::{routing::post, Router};
