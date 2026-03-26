@@ -1155,7 +1155,27 @@ async fn main() -> anyhow::Result<()> {
         let keys_state = api::admin::keys::AdminKeysState {
             db: std::sync::Arc::new(pool.clone()),
         };
-        Router::new()
+
+        // ── Revocation & Blacklist routes (Issue #138) ────────────────────────
+        let revocation_state = if let Some(ref redis) = redis_cache {
+            let svc = std::sync::Arc::new(services::revocation::RevocationService::new(
+                std::sync::Arc::new(pool.clone()),
+                std::sync::Arc::new(redis.clone()),
+                notification_service.clone(),
+            ));
+            let svc_clone = svc.clone();
+            tokio::spawn(async move {
+                if let Err(e) = svc_clone.bootstrap_redis_blacklist().await {
+                    tracing::error!(error = %e, "Redis blacklist bootstrap failed");
+                }
+            });
+            Some(api::admin::revocation::RevocationState { service: svc })
+        } else {
+            info!("Skipping revocation service (no Redis)");
+            None
+        };
+
+        let mut router = Router::new()
             .route("/api/admin/scopes", get(api::admin::scopes::list_scopes))
             .route(
                 "/api/admin/consumers/{consumer_id}/keys/{key_id}/scopes",
